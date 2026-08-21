@@ -1,0 +1,46 @@
+ESTIMTRANSFERT V1 — INSTALLATION RAPIDE
+======================================
+
+1. GOOGLE CLOUD
+   - Créer projet 
+
+   - Activer Google Drive API
+   - Créer OAuth Client ID > Web application
+   - Authorized JavaScript origin : URL GitHub Pages ou domaine personnalisé
+   - Copier le Client ID : 526246755192-sqo5uqfclqsjr3ei4teptklo3116vhj4.apps.googleusercontent.com
+
+2. GOOGLE APPS SCRIPT
+   - Créer un projet
+   - Copier apps-script/Code.gs
+   - Renseigner ADMIN_EMAIL
+   - Exécuter setupEstimTransfert() une fois
+   - Déployer > Application Web
+   - Exécuter en tant que : Moi
+   - Accès : Toute personne
+   - Copier l'URL /exec
+
+https://docs.google.com/spreadsheets/d/19qAYLG2xsbEmt-3-DPoB-blaTS9iQ7dgHGZ04LwZygY/edit?usp=sharing
+
+3. CONFIGURATION DU SITE
+   Modifier assets/js/config.js :
+   - ADMIN_EMAIL
+   - GOOGLE_CLIENT_ID
+   - APPS_SCRIPT_URL
+   - PUBLIC_BASE_URL
+
+4. GITHUB
+   - Créer un dépôt
+   - Y déposer tous les fichiers
+   - Settings > Pages > main / root
+
+5. TEST
+   - Se connecter
+   - Ajouter un petit fichier
+   - Créer le transfert
+   - Copier le lien généré
+   - Tester le lien dans une fenêtre privée
+
+6. EXPIRATION AUTOMATIQUE
+   Apps Script > Déclencheurs > cleanupExpiredTransfers > quotidien
+
+Voir README.md pour toutes les explications.
