@@ -12,7 +12,7 @@ window.ESTIM_CONFIG = {
 
   // URL de votre application Web Google Apps Script déployée.
   // Exemple : https://script.google.com/macros/s/AKfycb.../exec
-  APPS_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbzlt61PcxT9yE61CW0z7lFVHiu7gF0tbQwygKkUNULD9kGy4GfQ6UumZohhPVuvFfaS/exec',
+  APPS_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbxAT_ePbjmAi7J-sE16Yg7ktxYTrKifWL84GUDBdhdqMQrqkwsusSfj0fWimZQRZjHf/exec',
 
   // Adresse publique de votre site GitHub Pages / domaine personnalisé.
   // PAS de slash final.
