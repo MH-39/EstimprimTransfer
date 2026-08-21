@@ -52,7 +52,7 @@
     if (!C.APPS_SCRIPT_URL || C.APPS_SCRIPT_URL.includes('VOTRE_DEPLOIEMENT')) issues.push('APPS_SCRIPT_URL');
     if (!C.PUBLIC_BASE_URL || C.PUBLIC_BASE_URL.includes('votrecompte')) issues.push('PUBLIC_BASE_URL');
     if (issues.length) {
-      showAlert(authAlert, 'warn', 'Configuration à compléter dans assets/js/config.js : ' + issues.join(', ') + '.');
+      showAlert(authAlert, 'warn', 'Configuration Ã  complÃ©ter dans assets/js/config.js : ' + issues.join(', ') + '.');
     }
   }
 
@@ -103,7 +103,7 @@
   function signIn() {
     clearAlert(authAlert);
     if (!state.tokenClient) {
-      showAlert(authAlert, 'error', 'Le service Google n’est pas encore chargé. Réessayez dans quelques secondes.');
+      showAlert(authAlert, 'error', 'Le service Google nâ€™est pas encore chargÃ©. RÃ©essayez dans quelques secondes.');
       return;
     }
     state.tokenClient.requestAccessToken({ prompt: 'consent' });
@@ -111,7 +111,7 @@
 
   async function handleTokenResponse(resp) {
     if (resp.error) {
-      showAlert(authAlert, 'error', 'Connexion Google refusée : ' + resp.error);
+      showAlert(authAlert, 'error', 'Connexion Google refusÃ©e : ' + resp.error);
       return;
     }
     state.token = resp.access_token;
@@ -121,7 +121,7 @@
       const current = String(info.email || '').trim().toLowerCase();
       if (!current || current !== allowed) {
         await revokeToken();
-        throw new Error('Ce compte Google n’est pas autorisé à utiliser l’espace d’envoi.');
+        throw new Error('Ce compte Google nâ€™est pas autorisÃ© Ã  utiliser lâ€™espace dâ€™envoi.');
       }
 
       await ensureRootFolder();
@@ -130,7 +130,7 @@
       signOutBtn.hidden = false;
       clearAlert(authAlert);
     } catch (err) {
-      showAlert(authAlert, 'error', err.message || 'Impossible de vérifier votre compte Google.');
+      showAlert(authAlert, 'error', err.message || 'Impossible de vÃ©rifier votre compte Google.');
     }
   }
 
@@ -162,7 +162,7 @@
     const accepted = [];
     for (const file of newFiles) {
       if (file.size > maxBytes) {
-        showAlert(senderAlert, 'error', `${file.name} dépasse la limite configurée de ${C.MAX_FILE_SIZE_GB} Go.`);
+        showAlert(senderAlert, 'error', `${file.name} dÃ©passe la limite configurÃ©e de ${C.MAX_FILE_SIZE_GB} Go.`);
         continue;
       }
       const key = `${file.name}:${file.size}:${file.lastModified}`;
@@ -191,7 +191,7 @@
           <div class="file-name"></div>
           <div class="file-size">${formatBytes(file.size)}</div>
         </div>
-        <button class="remove-btn" type="button" aria-label="Retirer le fichier">×</button>`;
+        <button class="remove-btn" type="button" aria-label="Retirer le fichier">Ã—</button>`;
       row.querySelector('.file-name').textContent = file.name;
       row.querySelector('.remove-btn').addEventListener('click', () => {
         state.files.splice(index, 1);
@@ -236,7 +236,7 @@
   async function createTransfer() {
     clearAlert(senderAlert);
     if (!state.token) {
-      showAlert(senderAlert, 'error', 'Votre session Google a expiré. Reconnectez-vous.');
+      showAlert(senderAlert, 'error', 'Votre session Google a expirÃ©. Reconnectez-vous.');
       return;
     }
     if (!state.files.length) {
@@ -251,24 +251,27 @@
     const emailClient = $('emailClient').checked;
 
     if (recipientEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(recipientEmail)) {
-      showAlert(senderAlert, 'error', 'L’adresse e-mail du destinataire n’est pas valide.');
+      showAlert(senderAlert, 'error', 'Lâ€™adresse e-mail du destinataire nâ€™est pas valide.');
       return;
     }
     if (emailClient && !recipientEmail) {
-      showAlert(senderAlert, 'error', 'Indiquez l’e-mail du destinataire ou décochez l’envoi par e-mail.');
+      showAlert(senderAlert, 'error', 'Indiquez lâ€™e-mail du destinataire ou dÃ©cochez lâ€™envoi par e-mail.');
       return;
     }
 
     createBtn.disabled = true;
     statusBox.style.display = 'block';
-    setProgress(2, 'Création du transfert…', 'Préparation du dossier Google Drive.');
+    setProgress(2, 'CrÃ©ation du transfertâ€¦', 'PrÃ©paration du dossier Google Drive.');
 
     try {
       await ensureRootFolder();
       const token = secureToken();
       const now = new Date();
       const expiresAt = new Date(now.getTime() + expiryDays * 86400000);
-      const folderName = `${now.toISOString().slice(0,10)}_${token.slice(0,8)}${recipientName ? '_' + safeName(recipientName) : ''}`;
+      // Le dossier Drive reprend le nom du fichier ou du dossier source envoyÃ©.
+      // Ex. "Catalogue 2027.pdf" -> dossier "Catalogue 2027".
+      // Si les fichiers proviennent d'un dossier sÃ©lectionnÃ©, on conserve le nom du dossier racine.
+      const folderName = getTransferFolderName(state.files);
 
       const transferFolder = await drivePost('files?fields=id,name,webViewLink', {
         name: folderName,
@@ -277,7 +280,7 @@
       });
       state.currentTransferFolderId = transferFolder.id;
 
-      // Le dossier devient consultable par toute personne possédant le lien.
+      // Le dossier devient consultable par toute personne possÃ©dant le lien.
       await drivePost(`files/${encodeURIComponent(transferFolder.id)}/permissions?fields=id`, {
         role: 'reader',
         type: 'anyone'
@@ -292,7 +295,7 @@
         const baseDone = bytesDone;
         const result = await uploadResumable(file, transferFolder.id, (sent) => {
           const overall = ((baseDone + sent) / totalBytes) * 88 + 5;
-          setProgress(Math.min(93, overall), `Envoi ${i + 1}/${state.files.length}`, `${file.name} · ${formatBytes(sent)} / ${formatBytes(file.size)}`);
+          setProgress(Math.min(93, overall), `Envoi ${i + 1}/${state.files.length}`, `${file.name} Â· ${formatBytes(sent)} / ${formatBytes(file.size)}`);
         });
         bytesDone += file.size;
         uploaded.push({
@@ -304,7 +307,7 @@
         });
       }
 
-      setProgress(95, 'Finalisation…', 'Enregistrement du lien de transfert.');
+      setProgress(95, 'Finalisationâ€¦', 'Enregistrement du lien de transfert.');
       const base = String(C.PUBLIC_BASE_URL || '').replace(/\/$/, '');
       const transferUrl = `${base}/transfer/?id=${encodeURIComponent(token)}`;
 
@@ -324,7 +327,7 @@
       };
 
       await sendMetadata(payload);
-      setProgress(100, 'Terminé', 'Le lien est prêt.');
+      setProgress(100, 'TerminÃ©', 'Le lien est prÃªt.');
 
       generatedLink.value = transferUrl;
       formArea.style.display = 'none';
@@ -333,7 +336,7 @@
 
     } catch (err) {
       console.error(err);
-      showAlert(senderAlert, 'error', err.message || 'Le transfert n’a pas pu être créé.');
+      showAlert(senderAlert, 'error', err.message || 'Le transfert nâ€™a pas pu Ãªtre crÃ©Ã©.');
       createBtn.disabled = false;
     }
   }
@@ -343,7 +346,7 @@
     backendPayload.value = JSON.stringify(payload);
     backendForm.submit();
 
-    // Confirmation par lecture JSONP : évite les contraintes CORS de GitHub Pages.
+    // Confirmation par lecture JSONP : Ã©vite les contraintes CORS de GitHub Pages.
     for (let attempt = 0; attempt < 8; attempt++) {
       await sleep(700 + attempt * 250);
       try {
@@ -351,7 +354,7 @@
         if (found && found.ok) return found;
       } catch (_) {}
     }
-    throw new Error('Les fichiers sont dans Google Drive, mais le registre du transfert n’a pas répondu. Vérifiez le déploiement Apps Script.');
+    throw new Error('Les fichiers sont dans Google Drive, mais le registre du transfert nâ€™a pas rÃ©pondu. VÃ©rifiez le dÃ©ploiement Apps Script.');
   }
 
   async function uploadResumable(file, parentId, onProgress) {
@@ -365,12 +368,12 @@
       },
       body: JSON.stringify({ name: file.name, parents: [parentId] })
     });
-    if (!initResp.ok) throw await googleError(initResp, 'Impossible de préparer l’envoi vers Google Drive.');
+    if (!initResp.ok) throw await googleError(initResp, 'Impossible de prÃ©parer lâ€™envoi vers Google Drive.');
 
     const location = initResp.headers.get('Location');
-    if (!location) throw new Error('Google Drive n’a pas renvoyé d’URL d’envoi résumable.');
+    if (!location) throw new Error('Google Drive nâ€™a pas renvoyÃ© dâ€™URL dâ€™envoi rÃ©sumable.');
 
-    // 8 Mio : multiple de 256 KiB, recommandé par Google Drive.
+    // 8 Mio : multiple de 256 KiB, recommandÃ© par Google Drive.
     const chunkSize = 8 * 1024 * 1024;
     let offset = 0;
     let lastJson = null;
@@ -391,7 +394,7 @@
         onProgress?.(offset);
         continue;
       }
-      if (!resp.ok) throw await googleError(resp, `Échec de l’envoi de ${file.name}.`);
+      if (!resp.ok) throw await googleError(resp, `Ã‰chec de lâ€™envoi de ${file.name}.`);
       lastJson = await resp.json();
       offset = file.size;
       onProgress?.(offset);
@@ -428,7 +431,7 @@
     try {
       const data = await resp.json();
       msg = data?.error?.message || msg;
-      if (resp.status === 401) msg += ' Reconnectez-vous à Google.';
+      if (resp.status === 401) msg += ' Reconnectez-vous Ã  Google.';
     } catch (_) {}
     return new Error(msg);
   }
@@ -450,8 +453,8 @@
       generatedLink.select();
       document.execCommand('copy');
     }
-    copyMsg.textContent = '✓ Lien copié !';
-    copyBtn.textContent = 'COPIÉ';
+    copyMsg.textContent = 'âœ“ Lien copiÃ© !';
+    copyBtn.textContent = 'COPIÃ‰';
     setTimeout(() => { copyBtn.textContent = 'COPIER'; copyMsg.textContent = ''; }, 2200);
   }
 
@@ -478,6 +481,37 @@
     const bytes = new Uint8Array(18);
     crypto.getRandomValues(bytes);
     return [...bytes].map(b => b.toString(16).padStart(2, '0')).join('');
+  }
+
+
+  function getTransferFolderName(files) {
+    const list = Array.from(files || []);
+    if (!list.length) return 'Transfert';
+
+    // Si le navigateur fournit un chemin relatif (sÃ©lection de dossier),
+    // utiliser le nom du dossier racine.
+    const relativeRoots = list
+      .map(f => String(f.webkitRelativePath || '').split('/')[0])
+      .filter(Boolean);
+    if (relativeRoots.length && relativeRoots.every(v => v === relativeRoots[0])) {
+      return safeDriveFolderName(relativeRoots[0]);
+    }
+
+    // Sinon, utiliser le nom du premier fichier sans son extension.
+    const firstName = String(list[0].name || 'Transfert');
+    const dot = firstName.lastIndexOf('.');
+    const base = dot > 0 ? firstName.slice(0, dot) : firstName;
+    return safeDriveFolderName(base || firstName);
+  }
+
+  function safeDriveFolderName(value) {
+    // Google Drive accepte espaces et accents. On ne remplace que les caractÃ¨res
+    // pouvant gÃªner la lecture / l'affichage et on limite la longueur.
+    return String(value || 'Transfert')
+      .replace(/[\/]+/g, '-')
+      .replace(/[�-]/g, '')
+      .trim()
+      .slice(0, 180) || 'Transfert';
   }
 
   function safeName(value) {
@@ -512,7 +546,7 @@
     return new Promise((resolve, reject) => {
       const cb = '__estim_cb_' + Math.random().toString(36).slice(2);
       const script = document.createElement('script');
-      const timer = setTimeout(() => cleanup(new Error('Délai dépassé.')), 10000);
+      const timer = setTimeout(() => cleanup(new Error('DÃ©lai dÃ©passÃ©.')), 10000);
       const query = new URLSearchParams({ ...params, callback: cb });
       window[cb] = (data) => cleanup(null, data);
       script.onerror = () => cleanup(new Error('Impossible de joindre le service de transfert.'));
