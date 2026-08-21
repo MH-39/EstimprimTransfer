@@ -7,7 +7,7 @@ ESTIMTRANSFERT V1 — INSTALLATION RAPIDE
    - Activer Google Drive API
    - Créer OAuth Client ID > Web application
    - Authorized JavaScript origin : URL GitHub Pages ou domaine personnalisé
-   - Copier le Client ID : 526246755192-sqo5uqfclqsjr3ei4teptklo3116vhj4.apps.googleusercontent.com
+   - Copier le Client ID :
 
 2. GOOGLE APPS SCRIPT
    - Créer un projet
@@ -19,7 +19,6 @@ ESTIMTRANSFERT V1 — INSTALLATION RAPIDE
    - Accès : Toute personne
    - Copier l'URL /exec
 
-https://docs.google.com/spreadsheets/d/19qAYLG2xsbEmt-3-DPoB-blaTS9iQ7dgHGZ04LwZygY/edit?usp=sharing
 
 3. CONFIGURATION DU SITE
    Modifier assets/js/config.js :
