@@ -18,7 +18,7 @@ window.ESTIM_CONFIG = {
   // PAS de slash final.
   // Exemple GitHub : https://votrecompte.github.io/estimtransfert
   // Exemple domaine : https://transfert.estimprim.fr
-  PUBLIC_BASE_URL: 'https://github.com/MH-39/transfert-estimprim.git',
+  PUBLIC_BASE_URL: 'https://mh-39.github.io/transfert-estimprim',
 
   // Nom du dossier racine créé automatiquement dans votre Google Drive.
   DRIVE_ROOT_FOLDER_NAME: 'ESTIMPRIM TRANSFERT',
