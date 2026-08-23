@@ -7,6 +7,24 @@
   const token = params.get('id');
   let transfer = null;
 
+  /*
+   * GALERIE PHOTOS
+   * Ajoutez vos photos dans : assets/img/slideshow/
+   * puis inscrivez simplement leurs noms ci-dessous.
+   * Exemple : 'atelier-01.jpg', 'offset-xl.jpg', 'finition.jpg'
+   */
+  const SLIDESHOW_PHOTOS = [
+    // 'photo-01.jpg',
+    // 'photo-02.jpg',
+    // 'photo-03.jpg'
+  ];
+
+  let slideshowTimer = null;
+  let slideshowOrder = [];
+  let slideshowIndex = 0;
+
+  startSlideshow();
+
   if (!token) {
     showError('Le lien de transfert est incomplet.');
     return;
@@ -78,27 +96,132 @@
   }
 
   function downloadFile(file) {
+    showDownloadProgress(12, `Ouverture de ${file.name || 'votre fichier'}…`);
     notifyDownload(file.id || file.name);
+
     const a = document.createElement('a');
     a.href = file.downloadUrl || `https://drive.google.com/uc?export=download&id=${encodeURIComponent(file.id)}`;
     a.target = '_blank';
     a.rel = 'noopener';
     a.click();
+
+    // Google Drive effectue le téléchargement hors de cette page :
+    // la barre indique donc l'ouverture/lancement du téléchargement.
+    setTimeout(() => showDownloadProgress(68, 'Téléchargement lancé…'), 180);
+    setTimeout(() => showDownloadProgress(100, 'Téléchargement ouvert'), 520);
+    setTimeout(hideDownloadProgress, 1900);
   }
 
   async function downloadAll() {
-    $('downloadAllBtn').disabled = true;
-    $('downloadAllBtn').textContent = 'OUVERTURE DES TÉLÉCHARGEMENTS…';
-    // Plusieurs téléchargements peuvent être soumis aux règles du navigateur.
-    // Chaque fichier est ouvert à partir du clic de l'utilisateur, avec un court décalage.
-    for (const file of transfer.files) {
-      downloadFile(file);
+    const btn = $('downloadAllBtn');
+    btn.disabled = true;
+    btn.textContent = 'OUVERTURE DES TÉLÉCHARGEMENTS…';
+
+    const totalFiles = Math.max(1, transfer.files.length);
+    showDownloadProgress(4, 'Préparation des téléchargements…');
+
+    for (let i = 0; i < transfer.files.length; i++) {
+      const file = transfer.files[i];
+      notifyDownload(file.id || file.name);
+
+      const a = document.createElement('a');
+      a.href = file.downloadUrl || `https://drive.google.com/uc?export=download&id=${encodeURIComponent(file.id)}`;
+      a.target = '_blank';
+      a.rel = 'noopener';
+      a.click();
+
+      const percent = Math.round(((i + 1) / totalFiles) * 100);
+      showDownloadProgress(percent, `Ouverture ${i + 1}/${totalFiles} · ${file.name || 'fichier'}`);
       await sleep(450);
     }
+
+    showDownloadProgress(100, 'Tous les téléchargements ont été lancés');
+
     setTimeout(() => {
-      $('downloadAllBtn').disabled = false;
-      $('downloadAllBtn').textContent = 'TÉLÉCHARGER LES FICHIERS';
-    }, 1000);
+      btn.disabled = false;
+      btn.textContent = 'TÉLÉCHARGER LES FICHIERS';
+      hideDownloadProgress();
+    }, 1800);
+  }
+
+  function showDownloadProgress(percent, label) {
+    const box = $('downloadProgress');
+    const fill = $('downloadProgressFill');
+    const pct = $('downloadProgressPercent');
+    const text = $('downloadProgressLabel');
+    const value = Math.max(0, Math.min(100, Number(percent || 0)));
+
+    box.hidden = false;
+    fill.style.width = `${value}%`;
+    pct.textContent = `${Math.round(value)} %`;
+    text.textContent = label || 'Téléchargement…';
+  }
+
+  function hideDownloadProgress() {
+    const box = $('downloadProgress');
+    if (!box) return;
+    setTimeout(() => {
+      box.hidden = true;
+      $('downloadProgressFill').style.width = '0%';
+      $('downloadProgressPercent').textContent = '0 %';
+    }, 250);
+  }
+
+  function startSlideshow() {
+    const image = $('slideshowImage');
+    const placeholder = $('slideshowPlaceholder');
+    if (!image || !placeholder || !SLIDESHOW_PHOTOS.length) return;
+
+    slideshowOrder = shuffle([...SLIDESHOW_PHOTOS]);
+    slideshowIndex = Math.floor(Math.random() * slideshowOrder.length);
+
+    image.addEventListener('error', () => {
+      image.hidden = true;
+      placeholder.hidden = false;
+    });
+
+    showSlide(slideshowOrder[slideshowIndex], true);
+
+    if (slideshowOrder.length > 1) {
+      slideshowTimer = setInterval(() => {
+        slideshowIndex = (slideshowIndex + 1) % slideshowOrder.length;
+        showSlide(slideshowOrder[slideshowIndex], false);
+      }, 5200);
+    }
+  }
+
+  function showSlide(fileName, immediate) {
+    const image = $('slideshowImage');
+    const placeholder = $('slideshowPlaceholder');
+    if (!image) return;
+
+    const applyImage = () => {
+      image.onload = () => {
+        placeholder.hidden = true;
+        image.hidden = false;
+        requestAnimationFrame(() => {
+          image.classList.remove('is-changing');
+          image.classList.add('is-zooming');
+        });
+      };
+      image.classList.remove('is-zooming');
+      image.src = `../assets/img/slideshow/${encodeURIComponent(fileName)}`;
+    };
+
+    if (immediate || image.hidden) {
+      applyImage();
+    } else {
+      image.classList.add('is-changing');
+      setTimeout(applyImage, 420);
+    }
+  }
+
+  function shuffle(items) {
+    for (let i = items.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [items[i], items[j]] = [items[j], items[i]];
+    }
+    return items;
   }
 
   function notifyOpen() {
