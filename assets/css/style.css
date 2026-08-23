@@ -673,3 +673,111 @@ a { color: inherit; }
     transition: none !important;
   }
 }
+/* =========================================================
+   CORRECTION DIAPORAMA ESTIMTRANSFERT
+   À COLLER TOUT EN BAS de assets/css/style.css
+   ========================================================= */
+
+.client-slideshow {
+  position: relative;
+  min-width: 0;
+  min-height: 480px;
+  overflow: hidden;
+  border: 1px solid #272727;
+  border-radius: 24px;
+  background: #111;
+}
+
+.client-slideshow-photo {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background-position: center center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  opacity: 0;
+  transform: scale(1.02);
+  transition: opacity .65s ease, transform 5.2s ease;
+  will-change: opacity, transform;
+}
+
+.client-slideshow-photo.is-visible {
+  opacity: 1;
+  transform: scale(1.08);
+}
+
+.client-slideshow-placeholder {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 30px;
+  text-align: center;
+  background: #101010;
+}
+
+.client-slideshow-placeholder strong,
+.client-slideshow-placeholder span,
+.client-slideshow-placeholder small {
+  display: block;
+}
+
+.client-slideshow-placeholder strong {
+  margin-bottom: 8px;
+  font-size: 28px;
+  letter-spacing: .08em;
+  color: #fff;
+}
+
+.client-slideshow-placeholder span {
+  margin-bottom: 16px;
+  color: #d0d0d0;
+  font-size: 17px;
+}
+
+.client-slideshow-placeholder small {
+  color: #858585;
+  line-height: 1.6;
+}
+
+.client-slideshow-caption {
+  position: absolute;
+  z-index: 2;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  padding: 48px 24px 22px;
+  background: linear-gradient(to top, rgba(0,0,0,.90), rgba(0,0,0,0));
+  pointer-events: none;
+}
+
+.client-slideshow-caption strong,
+.client-slideshow-caption span {
+  display: block;
+}
+
+.client-slideshow-caption strong {
+  margin-bottom: 3px;
+  color: #fff;
+  font-size: 18px;
+}
+
+.client-slideshow-caption span {
+  color: #d2d2d2;
+  font-size: 13px;
+}
+
+@media (max-width: 860px) {
+  .client-slideshow {
+    min-height: 340px;
+  }
+}
+
+@media (max-width: 520px) {
+  .client-slideshow {
+    min-height: 280px;
+    border-radius: 18px;
+  }
+}
