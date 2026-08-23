@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex,nofollow">
+  <title>EstimTransfert — Téléchargement</title>
+  <link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body class="client-download-body">
+  <main class="download-shell client-download-shell">
+    <section class="download-page client-download-page">
+
+      <div class="client-logo-circle">
+        <img class="download-logo" src="../assets/img/logo-estimprim.png" alt="Estimprim">
+      </div>
+
+      <div class="client-download-grid">
+
+        <div class="download-card client-download-card">
+          <div id="loading" class="loading">Chargement du transfert…</div>
+
+          <div id="transferContent" hidden>
+            <div class="download-orbit">↓</div>
+            <h1>Un transfert pour vous</h1>
+            <p id="senderText">Estimprim vous a envoyé des fichiers.</p>
+            <div id="summary" class="transfer-summary"></div>
+            <div id="messageBox" class="message-box" hidden></div>
+            <div id="clientFileList" class="client-file-list"></div>
+            <button id="downloadAllBtn" class="primary-btn">TÉLÉCHARGER LES FICHIERS</button>
+            <div id="expiryNote" class="expiry-note"></div>
+          </div>
+
+          <div id="transferError" hidden>
+            <div class="download-orbit">!</div>
+            <h1>Transfert indisponible</h1>
+            <p id="transferErrorText">Ce lien n'est plus disponible.</p>
+          </div>
+        </div>
+
+        <aside class="client-slideshow" aria-label="Galerie Estimprim">
+          <img id="clientSlideshowImage" class="client-slideshow-image" alt="Photo Estimprim" hidden>
+
+          <div id="clientSlideshowPlaceholder" class="client-slideshow-placeholder">
+            <div>
+              <strong>ESTIMPRIM</strong>
+              <span>Galerie photos</span>
+              <small>Ajoutez vos photos dans<br>assets/img/slideshow/</small>
+            </div>
+          </div>
+
+          <div class="client-slideshow-caption">
+            <strong>Estimprim</strong>
+            <span>De l’idée au produit imprimé.</span>
+          </div>
+        </aside>
+
+      </div>
+
+      <footer class="footer">© Estimprim</footer>
+    </section>
+  </main>
+
+  <script src="../assets/js/config.js"></script>
+  <script src="../assets/js/transfer.js"></script>
+
+  <script>
+    /*
+     * Diaporama indépendant de transfer.js.
+     * Les photos doivent être placées dans : assets/img/slideshow/
+     * Ce fichier se trouve dans transfer/, donc le chemin relatif est :
+     * ../assets/img/slideshow/NOM_DU_FICHIER
+     */
+    const ESTIMPRIM_SLIDESHOW_PHOTOS = [
+      '490284490_1210058121123539_7212564635273295740_n.jpg',
+      '487320947_1200779785384706_6430073320876924404_n.jpg',
+      '487827807_1198607225601962_7083852209065370242_n.jpg',
+      '486616311_1197701002359251_7907232365323934613_n.jpg',
+      '493153602_1227443599384991_3476029885905123400_n.jpg',
+      '482359928_1183613547101330_5835285409625085282_n.jpg',
+      '476886992_9818853528151798_7740103691228781286_n.jpg',
+      '486955637_1197117682417583_7578840066891000458_n.jpg',
+      '494183660_1228163219313029_7290334784527927853_n.jpg',
+      '495211068_1236273925168625_7401350350301709400_n.jpg',
+      '490346411_1212117794250905_3942573189948830419_n.jpg',
+      '473174644_1117451139759220_3743156846620643893_n.jpg',
+      '489817902_1209515494511135_6960883644503999787_n.jpg',
+      '1782642603850.jpeg',
+      '1756732476811.jpeg',
+      '1762945013750.jpeg'
+    ];
+
+    (function startEstimprimSlideshow() {
+      const image = document.getElementById('clientSlideshowImage');
+      const placeholder = document.getElementById('clientSlideshowPlaceholder');
+
+      if (!image || !placeholder || ESTIMPRIM_SLIDESHOW_PHOTOS.length === 0) {
+        return;
+      }
+
+      // Mélange aléatoire une seule fois à chaque ouverture de page.
+      const photos = ESTIMPRIM_SLIDESHOW_PHOTOS.slice();
+      for (let i = photos.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        const tmp = photos[i];
+        photos[i] = photos[j];
+        photos[j] = tmp;
+      }
+
+      let index = 0;
+      let failedInARow = 0;
+      let timer = null;
+
+      function photoUrl(fileName) {
+        // encodeURI garde les / éventuels mais encode espaces et caractères spéciaux.
+        return encodeURI('../assets/img/slideshow/' + fileName);
+      }
+
+      function scheduleNext() {
+        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+          return;
+        }
+        window.clearTimeout(timer);
+        timer = window.setTimeout(showNextPhoto, 5200);
+      }
+
+      function showNextPhoto() {
+        if (!photos.length) return;
+
+        const fileName = photos[index];
+        index = (index + 1) % photos.length;
+
+        image.classList.remove('is-visible');
+
+        // Toujours installer les événements AVANT de changer src.
+        image.onload = function () {
+          failedInARow = 0;
+          placeholder.hidden = true;
+          image.hidden = false;
+
+          window.requestAnimationFrame(function () {
+            image.classList.add('is-visible');
+          });
+
+          scheduleNext();
+        };
+
+        image.onerror = function () {
+          console.warn('Photo du diaporama introuvable :', fileName);
+          image.hidden = true;
+          image.classList.remove('is-visible');
+          placeholder.hidden = false;
+
+          failedInARow += 1;
+
+          // Si une photo est absente/mal nommée, on essaie immédiatement la suivante.
+          // Après un tour complet sans succès, on laisse le placeholder affiché.
+          if (failedInARow < photos.length) {
+            window.setTimeout(showNextPhoto, 150);
+          }
+        };
+
+        // Petit délai pour permettre le fondu de sortie.
+        window.setTimeout(function () {
+          image.src = photoUrl(fileName);
+        }, 250);
+      }
+
+      showNextPhoto();
+    })();
+  </script>
+</body>
+</html>
