@@ -125,37 +125,91 @@
     setTimeout(hideDownloadProgress, 1900);
   }
 
-  async function downloadAll() {
-    const btn = $('downloadAllBtn');
-    btn.disabled = true;
-    btn.textContent = 'OUVERTURE DES TÉLÉCHARGEMENTS…';
+async function downloadAll() {
+  const btn = $('downloadAllBtn');
 
-    const totalFiles = Math.max(1, transfer.files.length);
-    showDownloadProgress(4, 'Préparation des téléchargements…');
+  btn.disabled = true;
+  btn.textContent = 'OUVERTURE DES TÉLÉCHARGEMENTS…';
 
-    for (let i = 0; i < transfer.files.length; i++) {
-      const file = transfer.files[i];
-      notifyDownload(file.id || file.name);
+  if (!transfer.files.length) {
+    btn.disabled = false;
+    btn.textContent = 'TÉLÉCHARGER LES FICHIERS';
+    return;
+  }
 
-      const a = document.createElement('a');
-      a.href = file.downloadUrl || `https://drive.google.com/uc?export=download&id=${encodeURIComponent(file.id)}`;
-      a.target = '_blank';
-      a.rel = 'noopener';
-      a.click();
-
-      const percent = Math.round(((i + 1) / totalFiles) * 100);
-      showDownloadProgress(percent, `Ouverture ${i + 1}/${totalFiles} · ${file.name || 'fichier'}`);
-      await sleep(450);
-    }
-
-    showDownloadProgress(100, 'Tous les téléchargements ont été lancés');
+  // Un seul fichier : téléchargement direct.
+  if (transfer.files.length === 1) {
+    downloadFile(transfer.files[0]);
 
     setTimeout(() => {
       btn.disabled = false;
       btn.textContent = 'TÉLÉCHARGER LES FICHIERS';
-      hideDownloadProgress();
-    }, 1800);
+    }, 1000);
+
+    return;
   }
+
+  showDownloadProgress(
+    5,
+    'Préparation des téléchargements…'
+  );
+
+  for (let i = 0; i < transfer.files.length; i++) {
+    const file = transfer.files[i];
+
+    const fileId = String(file.id || '').trim();
+
+    notifyDownload(
+      fileId ||
+      file.name
+    );
+
+    let url = String(
+      file.downloadUrl || ''
+    ).trim();
+
+    if (fileId) {
+      url =
+        'https://drive.usercontent.google.com/download' +
+        '?id=' + encodeURIComponent(fileId) +
+        '&export=download' +
+        '&confirm=t';
+    }
+
+    if (!url) {
+      continue;
+    }
+
+    const link = document.createElement('a');
+
+    link.href = url;
+    link.target = '_blank';
+    link.rel = 'noopener noreferrer';
+
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+
+    const percent =
+      Math.round(
+        ((i + 1) / transfer.files.length) * 100
+      );
+
+    showDownloadProgress(
+      percent,
+      `Ouverture ${i + 1}/${transfer.files.length} · ${file.name || 'fichier'}`
+    );
+
+    // Evite que le navigateur bloque plusieurs ouvertures trop rapides.
+    await sleep(900);
+  }
+
+  setTimeout(() => {
+    btn.disabled = false;
+    btn.textContent = 'TÉLÉCHARGER LES FICHIERS';
+    hideDownloadProgress();
+  }, 1600);
+}
 
   function showDownloadProgress(percent, label) {
     const box = $('downloadProgress');
