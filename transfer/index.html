@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex,nofollow">
+  <title>EstimTransfert — Téléchargement</title>
+  <link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body class="client-download-body">
+  <main class="download-shell client-download-shell">
+    <section class="download-page client-download-page">
+
+      <div class="client-logo-circle">
+        <img class="download-logo" src="../assets/img/logo-estimprim.png" alt="Estimprim">
+      </div>
+
+      <div class="client-download-grid">
+
+        <div class="download-card client-download-card">
+          <div id="loading" class="loading">Chargement du transfert…</div>
+
+          <div id="transferContent" hidden>
+            <div class="download-orbit">↓</div>
+            <h1>Un transfert pour vous</h1>
+            <p id="senderText">Estimprim vous a envoyé des fichiers.</p>
+            <div id="summary" class="transfer-summary"></div>
+            <div id="messageBox" class="message-box" hidden></div>
+            <div id="clientFileList" class="client-file-list"></div>
+            <button id="downloadAllBtn" class="primary-btn">TÉLÉCHARGER LES FICHIERS</button>
+            <div id="expiryNote" class="expiry-note"></div>
+          </div>
+
+          <div id="transferError" hidden>
+            <div class="download-orbit">!</div>
+            <h1>Transfert indisponible</h1>
+            <p id="transferErrorText">Ce lien n'est plus disponible.</p>
+          </div>
+        </div>
+
+        <aside class="client-slideshow" aria-label="Galerie Estimprim">
+          <img id="clientSlideshowImage" class="client-slideshow-image" alt="Photo Estimprim" hidden>
+
+          <div id="clientSlideshowPlaceholder" class="client-slideshow-placeholder">
+            <div>
+              <strong>ESTIMPRIM</strong>
+              <span>Galerie photos</span>
+              <small>Ajoutez vos photos dans<br>assets/img/slideshow/</small>
+            </div>
+          </div>
+
+          <div class="client-slideshow-caption">
+            <strong>Estimprim</strong>
+            <span>De l’idée au produit imprimé.</span>
+          </div>
+        </aside>
+
+      </div>
+
+      <footer class="footer">© Estimprim</footer>
+    </section>
+  </main>
+
+  <script src="../assets/js/config.js"></script>
+  <script src="../assets/js/transfer.js"></script>
+
+  <script>
+    /*
+     * Diaporama indépendant de transfer.js.
+     * Ajoutez plus tard les noms de vos photos dans ce tableau.
+     * Les fichiers doivent être placés dans : assets/img/slideshow/
+     */
+    const ESTIMPRIM_SLIDESHOW_PHOTOS = [
+      // 'photo-01.jpg',
+      // 'photo-02.jpg',
+      // 'photo-03.jpg'
+    ];
+
+    (function startEstimprimSlideshow() {
+      const image = document.getElementById('clientSlideshowImage');
+      const placeholder = document.getElementById('clientSlideshowPlaceholder');
+
+      if (!image || !placeholder || !ESTIMPRIM_SLIDESHOW_PHOTOS.length) return;
+
+      const photos = [...ESTIMPRIM_SLIDESHOW_PHOTOS];
+
+      for (let i = photos.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [photos[i], photos[j]] = [photos[j], photos[i]];
+      }
+
+      let index = Math.floor(Math.random() * photos.length);
+
+      function showPhoto() {
+        image.classList.remove('is-visible');
+
+        window.setTimeout(function () {
+          image.src = '../assets/img/slideshow/' + photos[index];
+          image.onload = function () {
+            placeholder.hidden = true;
+            image.hidden = false;
+            requestAnimationFrame(function () {
+              image.classList.add('is-visible');
+            });
+          };
+
+          image.onerror = function () {
+            image.hidden = true;
+            placeholder.hidden = false;
+          };
+
+          index = (index + 1) % photos.length;
+        }, 350);
+      }
+
+      showPhoto();
+
+      if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        window.setInterval(showPhoto, 5200);
+      }
+    })();
+  </script>
+</body>
+</html>
