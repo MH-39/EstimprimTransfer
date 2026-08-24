@@ -783,3 +783,55 @@ a { color: inherit; }
     border-radius: 18px;
   }
 }
+/* =========================================================
+   LOGO ESTIMPRIM DANS LE ROND DE TÉLÉCHARGEMENT
+   ========================================================= */
+
+.download-logo-orbit {
+  width: 100px;
+  height: 100px;
+
+  margin: 0 auto 24px;
+
+  border-radius: 50%;
+  background: #fff;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  box-sizing: border-box;
+
+  padding: 13px 14px 8px;
+
+  overflow: hidden;
+}
+
+
+/* Logo Estimprim original */
+.download-logo-orbit-img {
+  display: block;
+
+  width: 72px;
+  height: auto;
+
+  max-height: 55px;
+
+  object-fit: contain;
+
+  margin: 0;
+}
+
+
+/* Flèche sous le logo */
+.download-logo-arrow {
+  display: block;
+
+  margin-top: 3px;
+
+  color: #111;
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1;
+}
