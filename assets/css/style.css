@@ -561,8 +561,10 @@ a { color: inherit; }
   right: 0;
   bottom: 0;
   left: 0;
-  padding: 48px 24px 22px;
-  background: linear-gradient(to top, rgba(0,0,0,.9), rgba(0,0,0,0));
+  padding: 24px;
+
+  background: none;
+
   pointer-events: none;
 }
 
