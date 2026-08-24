@@ -835,3 +835,12 @@ a { color: inherit; }
   font-weight: 700;
   line-height: 1;
 }
+#downloadAllBtn {
+  background: #f28c24;
+  color: #fff;
+  border: none;
+}
+
+#downloadAllBtn:hover {
+  background: #d97712;
+}
