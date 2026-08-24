@@ -510,7 +510,7 @@ a { color: inherit; }
   object-fit: cover;
   opacity: 0;
   transform: scale(1.035);
-  transition: opacity .75s ease, transform 5.2s ease;
+  transition: opacity .75s ease, transform 4.2s ease;
 }
 
 .client-slideshow-image.is-visible {
