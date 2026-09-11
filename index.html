@@ -4,110 +4,185 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="robots" content="noindex,nofollow">
-  <title>EstimTransfert — Envoyer</title>
-  <link rel="stylesheet" href="assets/css/style.css">
-  <script src="https://accounts.google.com/gsi/client" async defer></script>
+  <title>EstimTransfert — Téléchargement</title>
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <link rel="stylesheet" href="../assets/css/transfer-design.css">
 </head>
-<body>
-  <div class="shell">
-    <main class="app-card">
-      <img src="assets/img/logo-estimprim.png" alt="Estimprim" width="135" height="100" class="logo">
-      <header class="topbar">
-<div class="top-actions">
-        <button id="signOutBtn" class="ghost-btn" hidden>Déconnexion</button>
-        </div>
-      </header>
+<body class="client-download-body">
+  <main class="download-shell client-download-shell">
+    <section class="download-page client-download-page">
 
-      <section id="authBox" class="auth-box">
-        <h2>Espace d'envoi privé</h2>
-        <p>Connectez-vous avec votre compte Google autorisé. Les fichiers seront envoyés directement dans votre Google Drive.</p>
-        <button id="signInBtn" class="primary-btn">SE CONNECTER AVEC GOOGLE</button>
-        <div id="authAlert" class="alert"></div>
-      </section>
 
-      <section id="senderApp" class="hero" hidden>
-        <div class="transfer-panel">
-          <div id="formArea">
-            <div id="dropzone" class="dropzone" tabindex="0" role="button" aria-label="Ajouter des fichiers">
-              <div class="drop-center">
-                <div class="plus-orbit">+</div>
-                <h1>Déposez vos fichiers ici</h1>
-                <p>ou cliquez pour ajouter des fichiers</p>
-                <div class="security-note">🔒 Envoi direct vers votre Google Drive</div>
-              </div>
-            </div>
-            <input id="fileInput" class="file-input" type="file" multiple>
+      <div class="client-download-grid">
 
-            <div id="fileList" class="file-list" hidden></div>
+        <div class="download-card client-download-card">
+          <div id="loading" class="loading">Chargement du transfert…</div>
 
-            <div class="form-grid">
-              <div class="field">
-                <label for="recipientName">Prénom / Nom</label>
-                <input id="recipientName" type="text" placeholder="Nom ou société">
-              </div>
-              <div class="field">
-                <label for="recipientEmail">E-mail du destinataire</label>
-                <input id="recipientEmail" type="email" placeholder="exemple@entreprise.fr">
-              </div>
-              <div class="field full">
-                <label for="message">Message (optionnel)</label>
-                <textarea id="message" placeholder="Votre message..."></textarea>
-              </div>
-              <div class="field">
-                <label for="expiryDays">Expiration</label>
-                <select id="expiryDays">
-                  <option value="1">1 jour</option>
-                  <option value="7" selected>7 jours</option>
-                  <option value="15">15 jours</option>
-                  <option value="30">30 jours</option>
-                </select>
-              </div>
-            </div>
+        <div id="transferContent" hidden>
+        <div class="download-logo-orbit">
+  <img
+    src="../assets/img/logo-estimprim.png"
+    alt="Estimprim"
+    class="download-logo-orbit-img"
+  >
 
-            <div class="options-row">
-              <label class="checkbox">
-                <input id="emailClient" type="checkbox">
-                Envoyer aussi le lien par e-mail
-              </label>
-            </div>
-
-            <div id="statusBox" class="status-box">
-              <div class="status-title" id="statusTitle">Préparation du transfert…</div>
-              <div class="progress-track"><div id="progressFill" class="progress-fill"></div></div>
-              <div id="statusDetail" class="status-detail"></div>
-            </div>
-
-            <div id="senderAlert" class="alert"></div>
-            <button id="createBtn" class="primary-btn" disabled>CRÉER LE TRANSFERT</button>
+  <span class="download-logo-arrow">↓</span>
+</div>
+            <h1>Un transfert pour vous</h1>
+            <p id="senderText">Estimprim vous a envoyé des fichiers.</p>
+            <div id="summary" class="transfer-summary"></div>
+            <div id="messageBox" class="message-box" hidden></div>
+            <div id="clientFileList" class="client-file-list"></div>
+            <button id="downloadAllBtn" class="primary-btn">TÉLÉCHARGER LES FICHIERS</button>
+            <div id="expiryNote" class="expiry-note"></div>
           </div>
 
-          <div id="resultBox" class="result-box">
-            <div class="result-check">✓</div>
-            <h2>Transfert créé</h2>
-            <p>Le lien est prêt à être envoyé à votre client.</p>
-            <div class="link-wrap">
-              <input id="generatedLink" type="text" readonly>
-              <button id="copyBtn" class="copy-btn">COPIER</button>
-            </div>
-            <div id="copyMsg" class="copy-msg"></div>
-            <div class="result-actions">
-              <button id="newTransferBtn" class="secondary-btn">Nouveau transfert</button>
-              <button id="openLinkBtn" class="secondary-btn">Ouvrir la page client</button>
-            </div>
+          <div id="transferError" hidden>
+            <div class="download-orbit">!</div>
+            <h1>Transfert indisponible</h1>
+            <p id="transferErrorText">Ce lien n'est plus disponible.</p>
           </div>
         </div>
-      </section>
 
-      <footer class="footer">Estimprim Transfert</footer>
-    </main>
-  </div>
+        <aside class="client-slideshow" aria-label="Galerie Estimprim">
+          <div id="clientSlideshowPhoto" class="client-slideshow-photo" aria-hidden="true"></div>
 
-  <iframe id="backendFrame" name="backendFrame" style="display:none"></iframe>
-  <form id="backendForm" method="post" target="backendFrame" style="display:none">
-    <input type="hidden" name="payload" id="backendPayload">
-  </form>
+          <div id="clientSlideshowPlaceholder" class="client-slideshow-placeholder">
+            <div>
+              <strong>ESTIMPRIM</strong>
+              <span>Galerie photos</span>
+              <small>Chargement des photos…</small>
+            </div>
+          </div>
 
-  <script src="assets/js/config.js"></script>
-  <script src="assets/js/admin.js"></script>
+          <div class="client-slideshow-caption">
+            <strong></strong>
+            <span></span>
+          </div>
+        </aside>
+
+      </div>
+
+      <footer class="footer">© Estimprim</footer>
+    </section>
+  </main>
+
+  <!-- Le diaporama est volontairement indépendant de transfer.js -->
+  <script>
+    (function () {
+      const PHOTOS = [ 
+        '1756732476811.jpeg',
+        '1762945013750.jpeg',
+        '473174644_1117451139759220_3743156846620643893_n.jpg',
+        '476886992_9818853528151798_7740103691228781286_n.jpg',
+        '482359928_1183613547101330_5835285409625085282_n.jpg',
+        '486616311_1197701002359251_7907232365323934613_n.jpg',
+        '486955637_1197117682417583_7578840066891000458_n.jpg',
+        '487320947_1200779785384706_6430073320876924404_n.jpg',
+        '487827807_1198607225601962_7083852209065370242_n.jpg',
+        '489817902_1209515494511135_6960883644503999787_n.jpg',
+        '490284490_1210058121123539_7212564635273295740_n.jpg',
+        '490346411_1212117794250905_3942573189948830419_n.jpg',
+        '493153602_1227443599384991_3476029885905123400_n.jpg',
+        '495211068_1236273925168625_7401350350301709400_n.jpg',
+        'IMG_7500.jpg',
+        'IMG_7501.jpg',
+        'IMG_7507.jpg',
+        'IMG_7509.jpg',
+        'IMG_7510.jpg',
+        'IMG_7512.jpg',
+        'IMG_7513.jpg',
+        'IMG_7515.jpg',
+        'IMG_7516.jpg',
+        'IMG_7517.jpg',
+        'IMG_7519.jpg',
+        'IMG_7520.jpg',
+        'IMG_7522.jpg',
+        'IMG_7524.jpg',
+        'IMG_7526.jpg',
+        'IMG_7527.jpg',
+        'IMG_7528.jpg',
+        'IMG_7530.jpg',
+        'IMG_7531.jpg',
+        'IMG_7533.jpg',
+        'IMG_7535.jpg'
+      ];
+
+      const photoLayer = document.getElementById('clientSlideshowPhoto');
+      const placeholder = document.getElementById('clientSlideshowPlaceholder');
+
+      if (!photoLayer || !placeholder || !PHOTOS.length) return;
+
+      // Mélange aléatoire à chaque ouverture de la page.
+      const photos = PHOTOS.slice();
+      for (let i = photos.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        const tmp = photos[i];
+        photos[i] = photos[j];
+        photos[j] = tmp;
+      }
+
+      // Construit le chemin à partir de l'URL réelle de la page GitHub Pages.
+      // Cela conserve automatiquement le nom du dépôt dans l'URL.
+      const slideshowBase = new URL('../assets/img/slideshow/', window.location.href);
+
+      let index = 0;
+      let failedCount = 0;
+      let timer = null;
+
+      function scheduleNext() {
+        window.clearTimeout(timer);
+        timer = window.setTimeout(showNext, 5200);
+      }
+
+      function showNext() {
+        if (!photos.length) return;
+
+        const fileName = photos[index];
+        index = (index + 1) % photos.length;
+
+        const url = new URL(fileName, slideshowBase).href;
+        const preloader = new Image();
+
+        preloader.onload = function () {
+          failedCount = 0;
+
+          photoLayer.classList.remove('is-visible');
+
+          window.setTimeout(function () {
+            photoLayer.style.backgroundImage = 'url("' + url.replace(/"/g, '%22') + '")';
+            placeholder.style.display = 'none';
+
+            window.requestAnimationFrame(function () {
+              photoLayer.classList.add('is-visible');
+            });
+
+            scheduleNext();
+          }, 220);
+        };
+
+        preloader.onerror = function () {
+          console.warn('EstimTransfert : photo introuvable', url);
+          failedCount += 1;
+
+          if (failedCount < photos.length) {
+            window.setTimeout(showNext, 100);
+          } else {
+            placeholder.style.display = 'flex';
+            const small = placeholder.querySelector('small');
+            if (small) small.textContent = 'Aucune photo accessible dans assets/img/slideshow/';
+          }
+        };
+
+        preloader.src = url;
+      }
+
+      showNext();
+    })();
+  </script>
+
+  <script src="../assets/js/config.js"></script>
+  <script src="../assets/js/transfer.js"></script>
 </body>
 </html>
+
